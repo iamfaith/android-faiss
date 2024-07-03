@@ -4,6 +4,8 @@
 .idea/workspace.xml
 .idea/
 
+
+.cxx/
 # Built application files
 *.apk
 *.ap_
