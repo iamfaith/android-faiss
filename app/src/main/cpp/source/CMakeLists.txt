@@ -26,10 +26,10 @@ set(EXTRA_DIR ${NATIVE_DIR}/extra)
 
 if ((${ANDROID_ABI} STREQUAL "arm64-v8a") OR (${ANDROID_ABI} STREQUAL "x86_64"))
     set(FAISS_DIR ${NATIVE_DIR}/faiss)
-    add_definitions(-D ANDROID_BIT32)
+    add_definitions(-D ANDROID_BIT64)
 else ()
     set(FAISS_DIR ${NATIVE_DIR}/faiss_32)
-    add_definitions(-D ANDROID_BIT64)
+    add_definitions(-D ANDROID_BIT32)
 endif ()
 
 

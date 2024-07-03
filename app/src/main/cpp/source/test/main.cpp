@@ -1,4 +1,4 @@
-#include <jni.h>
+
 #include <string>
 
 #include <cmath>
@@ -7,27 +7,19 @@
 
 #include <sys/time.h>
 
-#include "faiss/IndexIVFPQ.h"
-#include "faiss/IndexFlat.h"
-#include "faiss/index_io.h"
+#include "IndexIVFPQ.h"
+#include "IndexFlat.h"
+#include "index_io.h"
 
-#include "log.h"
-
-int64_t getCurrentMillTime() {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    return ((int64_t) tv.tv_sec * 1000 + (int64_t) tv.tv_usec / 1000);//毫秒
-}
-
-
+#include "../log.h"
 #define FEATURE_COUNT 256
-extern "C" JNIEXPORT jstring
+int main() {
 
-JNICALL stringFromJNI(JNIEnv *env, jclass clazz, jint number) {
+    LOGD("hello");
+
     std::string result = "0";
-    std::string name_faiss = "/sdcard/tmp/1.index";
     faiss::IndexFlatL2 *index;
-
+    std::string name_faiss = "1.index";
 
     index = new faiss::IndexFlatL2(FEATURE_COUNT);
     float data[FEATURE_COUNT];//random data
@@ -39,7 +31,7 @@ JNICALL stringFromJNI(JNIEnv *env, jclass clazz, jint number) {
 
         index->add(1, data);
         //Problems may occur in 32-bit
-        LOGD("SIZE= %lld", index->ntotal * index->d);
+        printf("SIZE= %ld\n", index->ntotal * index->d);
     }
     LOGI("index->add over");
 
@@ -49,7 +41,6 @@ JNICALL stringFromJNI(JNIEnv *env, jclass clazz, jint number) {
     faiss::write_index(index, name_faiss.c_str());
     LOGI("save ");
     delete index;
-
 
     LOGI("read ... ");
     faiss::Index *tmp = faiss::read_index(name_faiss.c_str(), faiss::IO_FLAG_MMAP);
@@ -85,64 +76,8 @@ JNICALL stringFromJNI(JNIEnv *env, jclass clazz, jint number) {
 
     LOGI("read");
     result = std::to_string(index->ntotal);
-    return env->NewStringUTF(result.c_str());
+
+
+    LOGI(result.c_str());
+    return 0;
 }
-
-#define JNIREG_CLASS_BASE "io/datamachines/faiss/MainActivity"
-static JNINativeMethod gMethods_Base[] = {
-        {"stringFromJNI", "(I)Ljava/lang/String;", (void *) stringFromJNI},
-};
-
-static int registerNativeMethods(JNIEnv *env, const char *className,
-                                 JNINativeMethod *gMethods, int numMethods) {
-    jclass clazz;
-    clazz = (*env).FindClass(className);
-    if (clazz == nullptr) {
-        return JNI_FALSE;
-    }
-    if ((*env).RegisterNatives(clazz, gMethods, numMethods) < 0) {
-        return JNI_FALSE;
-    }
-    return JNI_TRUE;
-}
-
-
-static int registerNatives(JNIEnv *env) {
-    if (!registerNativeMethods(env, JNIREG_CLASS_BASE, gMethods_Base,
-                               sizeof(gMethods_Base) / sizeof(gMethods_Base[0]))) {
-        return JNI_FALSE;
-    }
-
-
-    return JNI_TRUE;
-}
-
-
-JNIEXPORT jint
-
-JNICALL JNI_OnLoad(JavaVM *vm, void *reserved) {
-    LOGI("JNI_OnLoad");
-    JNIEnv *env = nullptr;
-    jint result = -1;
-
-    if ((*vm).GetEnv((void **) &env, JNI_VERSION_1_4) != JNI_OK) {
-        return -1;
-    }
-    assert(env != nullptr);
-
-    if (!registerNatives(env)) { //注册
-        return -1;
-    }
-
-    result = JNI_VERSION_1_4;
-    return result;
-
-}
-
-
-JNIEXPORT void JNI_OnUnload(JavaVM *vm, void *reserved) {
-
-
-}
-
-
