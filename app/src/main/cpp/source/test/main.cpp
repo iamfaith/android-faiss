@@ -55,7 +55,7 @@ int main() {
     index->reconstruct(index->ntotal - 1, read);
 
     for (int i = 0; i < FEATURE_COUNT; i++) {
-        LOGI("read[%d] %f %f", i, data[i], read[i]);
+        printf("read[%d] %f %f\n", i, data[i], read[i]);
     }
 
     float data2[FEATURE_COUNT];//random data
@@ -69,7 +69,7 @@ int main() {
     index->search(1, data2, destCount, listScore, listIndex);
     LOGI("index->search");
     for (int i = 0; i < destCount; i++) {
-        LOGI("index->search[%lld]=%f", listIndex[i], listScore[i]);
+        printf("index->search[%lld]=%f\n", listIndex[i], listScore[i]);
     }
     free(listIndex);
     free(listScore);
